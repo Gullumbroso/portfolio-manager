@@ -1,0 +1,43 @@
+import { useState } from "react"
+import { useParams } from "react-router-dom"
+import { PortfolioSummaryCards } from "@/components/dashboard/PortfolioSummaryCard"
+import { HoldingsTable } from "@/components/dashboard/HoldingsTable"
+import { PerformanceChart } from "@/components/dashboard/PerformanceChart"
+import { AddTransactionDialog } from "@/components/holdings/AddTransactionDialog"
+import { usePortfolioSummary, usePortfolioPerformance } from "@/hooks/usePortfolio"
+import { useHoldings } from "@/hooks/useHoldings"
+
+export function DashboardPage() {
+  const { portfolioId } = useParams<{ portfolioId: string }>()
+  const [showAddTxn, setShowAddTxn] = useState(false)
+  const [perfPeriod, setPerfPeriod] = useState("1M")
+
+  const { data: summary, isLoading: summaryLoading } = usePortfolioSummary(portfolioId)
+  const { data: holdings, isLoading: holdingsLoading } = useHoldings(portfolioId)
+  const { data: performance, isLoading: perfLoading } = usePortfolioPerformance(portfolioId, perfPeriod)
+
+  if (!portfolioId) return null
+
+  return (
+    <div className="space-y-6">
+      <PortfolioSummaryCards summary={summary} isLoading={summaryLoading} />
+      <PerformanceChart
+        data={performance}
+        period={perfPeriod}
+        onPeriodChange={setPerfPeriod}
+        isLoading={perfLoading}
+      />
+      <HoldingsTable
+        holdings={holdings}
+        portfolioId={portfolioId}
+        isLoading={holdingsLoading}
+        onAddTransaction={() => setShowAddTxn(true)}
+      />
+      <AddTransactionDialog
+        open={showAddTxn}
+        onOpenChange={setShowAddTxn}
+        portfolioId={portfolioId}
+      />
+    </div>
+  )
+}
