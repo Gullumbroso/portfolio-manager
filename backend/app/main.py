@@ -31,4 +31,10 @@ app.include_router(market_data.router, prefix="/api/market", tags=["market"])
 
 @app.get("/api/health")
 def health_check():
-    return {"status": "ok"}
+    s = get_settings()
+    return {
+        "status": "ok",
+        "supabase_url_set": bool(s.supabase_url),
+        "supabase_key_set": bool(s.supabase_key),
+        "finnhub_key_set": bool(s.finnhub_api_key),
+    }
