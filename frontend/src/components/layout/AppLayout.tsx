@@ -30,7 +30,7 @@ export function AppLayout() {
 
   return (
     <div className="flex h-screen flex-col">
-      <Header portfolios={portfolios} selectedId={portfolioId} onSelect={handleSelect} />
+      <Header portfolios={portfolios} selectedId={portfolioId} onSelect={handleSelect} onCreatePortfolio={() => setShowCreate(true)} />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar portfolioId={portfolioId} onCreatePortfolio={() => setShowCreate(true)} />
         <main className="flex-1 overflow-y-auto p-6">
