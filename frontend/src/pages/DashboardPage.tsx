@@ -6,6 +6,8 @@ import { PerformanceChart } from "@/components/dashboard/PerformanceChart"
 import { AddTransactionDialog } from "@/components/holdings/AddTransactionDialog"
 import { usePortfolioSummary, usePortfolioPerformance } from "@/hooks/usePortfolio"
 import { useHoldings } from "@/hooks/useHoldings"
+import { Button } from "@/components/ui/button"
+import { Plus } from "lucide-react"
 
 export function DashboardPage() {
   const { portfolioId } = useParams<{ portfolioId: string }>()
@@ -38,6 +40,15 @@ export function DashboardPage() {
         onOpenChange={setShowAddTxn}
         portfolioId={portfolioId}
       />
+
+      {/* Mobile FAB for adding transactions */}
+      <Button
+        size="icon"
+        className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg md:hidden"
+        onClick={() => setShowAddTxn(true)}
+      >
+        <Plus className="h-6 w-6" />
+      </Button>
     </div>
   )
 }
