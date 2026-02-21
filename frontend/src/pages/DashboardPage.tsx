@@ -36,7 +36,6 @@ export function DashboardPage() {
           <HoldingsPieChart
             holdings={holdings}
             cashBalance={summary?.cash_balance}
-            totalValue={summary?.total_value}
             isLoading={holdingsLoading || summaryLoading}
           />
         </div>

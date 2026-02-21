@@ -27,11 +27,10 @@ interface Slice {
 interface Props {
   holdings: Holding[] | undefined
   cashBalance: number | undefined
-  totalValue: number | undefined
   isLoading: boolean
 }
 
-export function HoldingsPieChart({ holdings, cashBalance, totalValue, isLoading }: Props) {
+export function HoldingsPieChart({ holdings, cashBalance, isLoading }: Props) {
   const slices = useMemo(() => {
     if (!holdings) return []
 
