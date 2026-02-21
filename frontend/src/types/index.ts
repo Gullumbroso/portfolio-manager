@@ -49,6 +49,7 @@ export interface TransactionCreate {
   amount?: number
   note?: string
   transacted_at?: string
+  auto_fund_amount?: number
 }
 
 export interface Holding {

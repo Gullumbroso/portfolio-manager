@@ -1,16 +1,17 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useCreateTransaction } from "@/hooks/useTransactions"
 import type { TransactionType } from "@/types"
-import { cn } from "@/lib/utils"
+import { cn, formatCurrency } from "@/lib/utils"
 
 interface Props {
   open: boolean
   onOpenChange: (open: boolean) => void
   portfolioId: string
+  cashBalance?: number
 }
 
 const TYPES: { value: TransactionType; label: string }[] = [
@@ -20,16 +21,34 @@ const TYPES: { value: TransactionType; label: string }[] = [
   { value: "WITHDRAWAL", label: "Withdraw" },
 ]
 
-export function AddTransactionDialog({ open, onOpenChange, portfolioId }: Props) {
+export function AddTransactionDialog({ open, onOpenChange, portfolioId, cashBalance = 0 }: Props) {
   const [type, setType] = useState<TransactionType>("BUY")
   const [ticker, setTicker] = useState("")
   const [shares, setShares] = useState("")
   const [pricePerShare, setPricePerShare] = useState("")
   const [amount, setAmount] = useState("")
   const [note, setNote] = useState("")
+  const [fromCash, setFromCash] = useState("")
 
   const createTxn = useCreateTransaction(portfolioId)
   const isStock = type === "BUY" || type === "SELL"
+
+  const computedTotal = isStock && shares && pricePerShare
+    ? parseFloat(shares) * parseFloat(pricePerShare)
+    : null
+
+  // When the buy total or available cash changes, set a smart default for fromCash
+  useEffect(() => {
+    if (type === "BUY" && computedTotal !== null && cashBalance > 0) {
+      const defaultFromCash = Math.min(cashBalance, computedTotal)
+      setFromCash(defaultFromCash.toFixed(2))
+    } else {
+      setFromCash("")
+    }
+  }, [type, computedTotal, cashBalance])
+
+  const fromCashNum = parseFloat(fromCash) || 0
+  const autoFundAmount = computedTotal !== null ? Math.max(0, computedTotal - fromCashNum) : 0
 
   function reset() {
     setType("BUY")
@@ -38,6 +57,7 @@ export function AddTransactionDialog({ open, onOpenChange, portfolioId }: Props)
     setPricePerShare("")
     setAmount("")
     setNote("")
+    setFromCash("")
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -50,6 +70,7 @@ export function AddTransactionDialog({ open, onOpenChange, portfolioId }: Props)
         shares: parseFloat(shares),
         price_per_share: parseFloat(pricePerShare),
         note,
+        ...(type === "BUY" && { auto_fund_amount: autoFundAmount }),
       })
     } else {
       await createTxn.mutateAsync({
@@ -63,9 +84,7 @@ export function AddTransactionDialog({ open, onOpenChange, portfolioId }: Props)
     onOpenChange(false)
   }
 
-  const computedAmount = isStock && shares && pricePerShare
-    ? (parseFloat(shares) * parseFloat(pricePerShare)).toFixed(2)
-    : null
+  const maxFromCash = computedTotal !== null ? Math.min(cashBalance, computedTotal) : cashBalance
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -136,9 +155,62 @@ export function AddTransactionDialog({ open, onOpenChange, portfolioId }: Props)
                   />
                 </div>
               </div>
-              {computedAmount && (
-                <div className="text-sm text-muted-foreground">
-                  Total: ${computedAmount}
+
+              {/* Funding breakdown for BUY */}
+              {type === "BUY" && computedTotal !== null && (
+                <div className="rounded-lg border bg-muted/40 p-3 space-y-3">
+                  <div className="flex items-center justify-between text-sm font-medium">
+                    <span>Total cost</span>
+                    <span>{formatCurrency(computedTotal)}</span>
+                  </div>
+
+                  {cashBalance > 0 ? (
+                    <>
+                      <div className="flex items-center gap-3">
+                        <Label htmlFor="fromCash" className="text-sm w-28 shrink-0 text-muted-foreground">
+                          From cash
+                        </Label>
+                        <div className="relative flex-1">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
+                          <Input
+                            id="fromCash"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            max={maxFromCash}
+                            value={fromCash}
+                            onChange={(e) => setFromCash(e.target.value)}
+                            className="pl-7"
+                          />
+                        </div>
+                        <span className="text-xs text-muted-foreground w-20 text-right shrink-0">
+                          of {formatCurrency(cashBalance)}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">From external deposit</span>
+                        <span className={cn(
+                          "font-medium tabular-nums",
+                          autoFundAmount > 0 ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground"
+                        )}>
+                          {formatCurrency(autoFundAmount)}
+                        </span>
+                      </div>
+                      {autoFundAmount > 0 && (
+                        <p className="text-xs text-muted-foreground">
+                          A deposit of {formatCurrency(autoFundAmount)} will be added automatically.
+                        </p>
+                      )}
+                    </>
+                  ) : (
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">External deposit (auto)</span>
+                      <span className="font-medium text-blue-600 dark:text-blue-400 tabular-nums">
+                        {formatCurrency(computedTotal)}
+                      </span>
+                    </div>
+                  )}
                 </div>
               )}
             </>

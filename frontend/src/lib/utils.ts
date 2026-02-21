@@ -26,6 +26,13 @@ export function formatNumber(value: number, decimals = 2): string {
   }).format(value)
 }
 
+export function formatCompactCurrency(value: number): string {
+  const abs = Math.abs(value)
+  if (abs >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`
+  if (abs >= 1_000) return `$${(value / 1_000).toFixed(1)}K`
+  return formatCurrency(value)
+}
+
 export function isMarketOpen(): boolean {
   const now = new Date()
   const et = new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }))

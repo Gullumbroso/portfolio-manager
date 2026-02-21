@@ -20,6 +20,8 @@ class TransactionCreate(BaseModel):
     amount: float | None = None
     note: str = ""
     transacted_at: datetime | None = None
+    # For BUY: amount to auto-deposit as external funding (0 = use existing cash only)
+    auto_fund_amount: float = 0.0
 
     @model_validator(mode="after")
     def validate_transaction(self):

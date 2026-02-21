@@ -49,11 +49,23 @@ export function PerformanceChart({ data, period, onPeriodChange, isLoading }: Pr
     series.setData(
       data.map((p) => ({
         time: p.date,
-        value: p.total_value,
+        value: p.market_value,
       }))
     )
 
     chart.timeScale().fitContent()
+
+    // Clamp visible range to data boundaries
+    const dataLength = data.length
+    chart.timeScale().subscribeVisibleLogicalRangeChange((range) => {
+      if (!range) return
+      const from = Math.max(range.from, 0)
+      const to = Math.min(range.to, dataLength - 1)
+      if (from !== range.from || to !== range.to) {
+        chart.timeScale().setVisibleLogicalRange({ from, to })
+      }
+    })
+
     chartInstance.current = chart
 
     const handleResize = () => {

@@ -1,9 +1,18 @@
 from __future__ import annotations
+import re
 import yfinance as yf
 import finnhub
 from datetime import datetime, timezone
 from app.database import get_supabase
 from app.config import get_settings
+
+
+def _parse_datetime(s: str) -> datetime:
+    """Parse ISO datetime string — handles variable-length fractional seconds (Python 3.9 compat)."""
+    s = s.replace("Z", "+00:00")
+    # Pad or truncate fractional seconds to exactly 6 digits
+    s = re.sub(r"\.(\d+)", lambda m: "." + m.group(1)[:6].ljust(6, "0"), s)
+    return datetime.fromisoformat(s)
 
 # Period mapping for yfinance
 PERIOD_MAP = {
@@ -11,6 +20,8 @@ PERIOD_MAP = {
     "1W": ("5d", "30m"),
     "1M": ("1mo", "1d"),
     "3M": ("3mo", "1d"),
+    "6M": ("6mo", "1d"),
+    "YTD": ("ytd", "1d"),
     "1Y": ("1y", "1d"),
     "ALL": ("max", "1wk"),
 }
@@ -32,7 +43,7 @@ def _get_cached_quote(ticker: str) -> dict | None:
     if not result.data:
         return None
     row = result.data[0]
-    fetched_at = datetime.fromisoformat(row["fetched_at"].replace("Z", "+00:00"))
+    fetched_at = _parse_datetime(row["fetched_at"])
     age = (datetime.now(timezone.utc) - fetched_at).total_seconds()
     if age > CACHE_TTL_SECONDS:
         return None

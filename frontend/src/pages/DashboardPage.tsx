@@ -2,7 +2,9 @@ import { useState } from "react"
 import { useParams } from "react-router-dom"
 import { PortfolioSummaryCards } from "@/components/dashboard/PortfolioSummaryCard"
 import { HoldingsTable } from "@/components/dashboard/HoldingsTable"
+import { HoldingsPieChart } from "@/components/dashboard/HoldingsPieChart"
 import { PerformanceChart } from "@/components/dashboard/PerformanceChart"
+import { IndexComparisonChart } from "@/components/dashboard/IndexComparisonChart"
 import { AddTransactionDialog } from "@/components/holdings/AddTransactionDialog"
 import { usePortfolioSummary, usePortfolioPerformance } from "@/hooks/usePortfolio"
 import { useHoldings } from "@/hooks/useHoldings"
@@ -29,16 +31,30 @@ export function DashboardPage() {
         onPeriodChange={setPerfPeriod}
         isLoading={perfLoading}
       />
-      <HoldingsTable
-        holdings={holdings}
-        portfolioId={portfolioId}
-        isLoading={holdingsLoading}
-        onAddTransaction={() => setShowAddTxn(true)}
-      />
+      <div className="grid gap-6 lg:grid-cols-5">
+        <div className="lg:col-span-2">
+          <HoldingsPieChart
+            holdings={holdings}
+            cashBalance={summary?.cash_balance}
+            totalValue={summary?.total_value}
+            isLoading={holdingsLoading || summaryLoading}
+          />
+        </div>
+        <div className="lg:col-span-3">
+          <HoldingsTable
+            holdings={holdings}
+            portfolioId={portfolioId}
+            isLoading={holdingsLoading}
+            onAddTransaction={() => setShowAddTxn(true)}
+          />
+        </div>
+      </div>
+      <IndexComparisonChart portfolioId={portfolioId} />
       <AddTransactionDialog
         open={showAddTxn}
         onOpenChange={setShowAddTxn}
         portfolioId={portfolioId}
+        cashBalance={summary?.cash_balance}
       />
 
       {/* Mobile FAB for adding transactions */}

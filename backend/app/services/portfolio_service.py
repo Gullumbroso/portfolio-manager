@@ -52,7 +52,7 @@ def get_portfolio_cash(portfolio_id: UUID):
 
 
 def get_performance(portfolio_id: UUID, period: str = "1M"):
-    """Get portfolio performance snapshots."""
+    """Get portfolio performance — from snapshots if available, otherwise reconstructed from transactions."""
     db = get_supabase()
     result = (
         db.table("portfolio_snapshots")
@@ -61,4 +61,99 @@ def get_performance(portfolio_id: UUID, period: str = "1M"):
         .order("date")
         .execute()
     )
-    return result.data
+    if result.data:
+        return result.data
+
+    return _reconstruct_performance(portfolio_id, period)
+
+
+def _reconstruct_performance(portfolio_id: UUID, period: str = "1M"):
+    """Reconstruct daily portfolio values from transactions + historical prices."""
+    from app.services.market_data_service import get_history
+
+    # Intraday periods don't make sense for reconstruction — use daily equivalents
+    if period in ("1D", "1W"):
+        period = "1M"
+
+    db = get_supabase()
+    txns = (
+        db.table("transactions")
+        .select("*")
+        .eq("portfolio_id", str(portfolio_id))
+        .order("transacted_at")
+        .execute()
+    )
+    if not txns.data:
+        return []
+
+    # Collect unique stock tickers (BUY/SELL only)
+    tickers = list(set(t["ticker"] for t in txns.data if t.get("ticker")))
+
+    # Fetch historical prices for each ticker over the requested period
+    price_histories: dict[str, dict[str, float]] = {}
+    for ticker in tickers:
+        try:
+            history = get_history(ticker, period)
+            price_histories[ticker] = {p["date"]: p["close"] for p in history}
+        except Exception:
+            pass
+
+    if not price_histories:
+        return []
+
+    # All trading dates from price data, starting from the first transaction
+    first_txn_date = txns.data[0]["transacted_at"][:10]
+    all_dates = sorted(d for d in set(d for ph in price_histories.values() for d in ph) if d >= first_txn_date)
+
+    points = []
+    for date in all_dates:
+        # Replay transactions up to this date to get holdings + cash
+        cash = 0.0
+        total_deposits = 0.0
+        holdings: dict[str, float] = {}
+
+        for txn in txns.data:
+            txn_date = txn["transacted_at"][:10]
+            if txn_date > date:
+                break
+
+            txn_type = txn["type"]
+            amount = float(txn.get("amount") or 0)
+
+            if txn_type == "DEPOSIT":
+                cash += amount
+                total_deposits += amount
+            elif txn_type == "WITHDRAWAL":
+                cash -= amount
+                total_deposits -= amount
+            elif txn_type == "BUY":
+                ticker = txn["ticker"]
+                shares = float(txn.get("shares") or 0)
+                holdings[ticker] = holdings.get(ticker, 0) + shares
+                cash -= amount
+            elif txn_type == "SELL":
+                ticker = txn["ticker"]
+                shares = float(txn.get("shares") or 0)
+                holdings[ticker] = holdings.get(ticker, 0) - shares
+                cash += amount
+
+        # Compute market value using that day's prices
+        market_value = 0.0
+        for ticker, shares in holdings.items():
+            if shares > 0 and ticker in price_histories:
+                price = price_histories[ticker].get(date, 0)
+                if price:
+                    market_value += shares * price
+
+        total_value = market_value + cash
+
+        points.append({
+            "date": date,
+            "total_value": round(total_value, 2),
+            "cash_balance": round(cash, 2),
+            "market_value": round(market_value, 2),
+            "total_deposits": round(total_deposits, 2),
+            "profit": round(total_value - total_deposits, 2),
+        })
+
+    return points
