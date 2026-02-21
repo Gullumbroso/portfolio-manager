@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from uuid import UUID
 from app.database import get_supabase
 from app.schemas.portfolio import PortfolioCreate, PortfolioUpdate
