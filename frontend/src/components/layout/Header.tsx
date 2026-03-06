@@ -1,6 +1,6 @@
 import { Select } from "@/components/ui/select"
 import type { Portfolio } from "@/types"
-import { TrendingUp, Pencil, Trash2 } from "lucide-react"
+import { TrendingUp, Pencil, Trash2, Menu } from "lucide-react"
 
 const CREATE_NEW_VALUE = "__create_new__"
 
@@ -11,9 +11,10 @@ interface HeaderProps {
   onCreatePortfolio: () => void
   onEditPortfolio: () => void
   onDeletePortfolio: () => void
+  onToggleMobileMenu?: () => void
 }
 
-export function Header({ portfolios, selectedId, onSelect, onCreatePortfolio, onEditPortfolio, onDeletePortfolio }: HeaderProps) {
+export function Header({ portfolios, selectedId, onSelect, onCreatePortfolio, onEditPortfolio, onDeletePortfolio, onToggleMobileMenu }: HeaderProps) {
   function handleChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const value = e.target.value
     if (value === CREATE_NEW_VALUE) {
@@ -31,13 +32,19 @@ export function Header({ portfolios, selectedId, onSelect, onCreatePortfolio, on
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
-      <div className="flex h-14 items-center gap-4 px-4 sm:px-6">
+      <div className="flex h-14 items-center gap-3 px-4 sm:px-6">
+        <button
+          onClick={onToggleMobileMenu}
+          className="md:hidden rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
         <div className="flex items-center gap-2 font-semibold">
           <TrendingUp className="h-5 w-5" />
           <span className="hidden sm:inline">Portfolio Manager</span>
         </div>
         <div className="ml-auto flex items-center gap-2">
-          <div className="w-48 sm:w-64">
+          <div className="min-w-0 flex-1 max-w-48 sm:max-w-64 sm:flex-none sm:w-64">
             <Select
               value={selectedId ?? ""}
               onChange={handleChange}

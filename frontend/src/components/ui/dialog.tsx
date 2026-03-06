@@ -13,7 +13,7 @@ function Dialog({ open, onOpenChange, children }: DialogProps) {
   return (
     <div className="fixed inset-0 z-50">
       <div className="fixed inset-0 bg-black/80" onClick={() => onOpenChange(false)} />
-      <div className="fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
         {children}
       </div>
     </div>
@@ -22,7 +22,7 @@ function Dialog({ open, onOpenChange, children }: DialogProps) {
 
 function DialogContent({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement> & { onCloseClick?: () => void }) {
   return (
-    <div className={cn("bg-background rounded-lg border p-6 shadow-lg", className)} {...props}>
+    <div className={cn("bg-background rounded-lg border p-6 shadow-lg w-full max-w-lg max-h-[85vh] overflow-y-auto", className)} {...props}>
       {children}
     </div>
   )

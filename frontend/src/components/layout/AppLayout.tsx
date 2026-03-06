@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Outlet, useNavigate, useParams } from "react-router-dom"
+import { Outlet, useNavigate, useParams, useLocation } from "react-router-dom"
 import { Header } from "./Header"
 import { Sidebar } from "./Sidebar"
 import { usePortfolios, useCreatePortfolio, useUpdatePortfolio, useDeletePortfolio } from "@/hooks/usePortfolio"
@@ -11,6 +11,7 @@ import { Loader2 } from "lucide-react"
 
 export function AppLayout() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { portfolioId } = useParams()
   const { data: portfolios = [] } = usePortfolios()
   const createPortfolio = useCreatePortfolio()
@@ -21,8 +22,13 @@ export function AppLayout() {
   const [showDelete, setShowDelete] = useState(false)
   const [newName, setNewName] = useState("")
   const [editName, setEditName] = useState("")
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const selectedPortfolio = portfolios.find((p) => p.id === portfolioId)
+
+  useEffect(() => {
+    setMobileMenuOpen(false)
+  }, [location.pathname])
 
   useEffect(() => {
     if (showEdit && selectedPortfolio) {
@@ -64,10 +70,16 @@ export function AppLayout() {
         onCreatePortfolio={() => setShowCreate(true)}
         onEditPortfolio={() => setShowEdit(true)}
         onDeletePortfolio={() => setShowDelete(true)}
+        onToggleMobileMenu={() => setMobileMenuOpen((o) => !o)}
       />
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar portfolioId={portfolioId} onCreatePortfolio={() => setShowCreate(true)} />
-        <main className="flex-1 overflow-y-auto p-6">
+        <Sidebar
+          portfolioId={portfolioId}
+          onCreatePortfolio={() => setShowCreate(true)}
+          mobileOpen={mobileMenuOpen}
+          onMobileClose={() => setMobileMenuOpen(false)}
+        />
+        <main className="flex-1 overflow-y-auto p-4 md:p-6">
           <Outlet context={{ onCreatePortfolio: () => setShowCreate(true) }} />
         </main>
       </div>

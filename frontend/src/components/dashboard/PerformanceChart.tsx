@@ -34,7 +34,7 @@ export function PerformanceChart({ data, period, onPeriodChange, isLoading }: Pr
         horzLines: { color: "rgba(0,0,0,0.06)" },
       },
       width: chartRef.current.clientWidth,
-      height: 300,
+      height: chartRef.current.clientWidth < 640 ? 220 : 300,
       timeScale: { borderColor: "rgba(0,0,0,0.1)" },
       rightPriceScale: { borderColor: "rgba(0,0,0,0.1)" },
     })
@@ -84,9 +84,9 @@ export function PerformanceChart({ data, period, onPeriodChange, isLoading }: Pr
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <CardTitle>Performance</CardTitle>
-        <div className="flex gap-1">
+        <div className="flex flex-wrap gap-1">
           {PERIODS.map((p) => (
             <Button
               key={p}
@@ -101,11 +101,11 @@ export function PerformanceChart({ data, period, onPeriodChange, isLoading }: Pr
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+          <div className="h-[220px] sm:h-[300px] flex items-center justify-center text-muted-foreground">
             Loading chart...
           </div>
         ) : !data?.length ? (
-          <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+          <div className="h-[220px] sm:h-[300px] flex items-center justify-center text-muted-foreground">
             No performance data yet. Data is captured daily.
           </div>
         ) : (

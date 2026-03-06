@@ -87,7 +87,7 @@ export function IndexComparisonChart({ portfolioId }: Props) {
         horzLines: { color: "rgba(0,0,0,0.06)" },
       },
       width: chartRef.current.clientWidth,
-      height: 350,
+      height: chartRef.current.clientWidth < 640 ? 250 : 350,
       timeScale: { borderColor: "rgba(0,0,0,0.1)" },
       rightPriceScale: {
         borderColor: "rgba(0,0,0,0.1)",
@@ -200,11 +200,11 @@ export function IndexComparisonChart({ portfolioId }: Props) {
         </div>
 
         {allLoading ? (
-          <div className="h-[350px] flex items-center justify-center text-muted-foreground">
+          <div className="h-[250px] sm:h-[350px] flex items-center justify-center text-muted-foreground">
             Loading comparison...
           </div>
         ) : !hasAnyData ? (
-          <div className="h-[350px] flex items-center justify-center text-muted-foreground">
+          <div className="h-[250px] sm:h-[350px] flex items-center justify-center text-muted-foreground">
             No data available. Enable an index or wait for portfolio data.
           </div>
         ) : (
