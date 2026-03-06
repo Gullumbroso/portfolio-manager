@@ -42,10 +42,14 @@ export function AppLayout() {
 
   async function handleCreate() {
     if (!newName.trim() || createPortfolio.isPending) return
-    const portfolio = await createPortfolio.mutateAsync({ name: newName.trim() })
-    setShowCreate(false)
-    setNewName("")
-    navigate(`/portfolio/${portfolio.id}`)
+    try {
+      const portfolio = await createPortfolio.mutateAsync({ name: newName.trim() })
+      setShowCreate(false)
+      setNewName("")
+      navigate(`/portfolio/${portfolio.id}`)
+    } catch {
+      // mutation error state is tracked by react-query and displayed in the dialog
+    }
   }
 
   async function handleEdit() {
@@ -85,7 +89,7 @@ export function AppLayout() {
       </div>
 
       {/* Create Portfolio Dialog */}
-      <Dialog open={showCreate} onOpenChange={(open) => !createPortfolio.isPending && setShowCreate(open)}>
+      <Dialog open={showCreate} onOpenChange={(open) => { if (!createPortfolio.isPending) { setShowCreate(open); if (!open) createPortfolio.reset() } }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Create New Portfolio</DialogTitle>
@@ -101,6 +105,9 @@ export function AppLayout() {
                 onKeyDown={(e) => e.key === "Enter" && handleCreate()}
               />
             </div>
+            {createPortfolio.isError && (
+              <p className="text-sm text-destructive">Failed to create portfolio. Please try again.</p>
+            )}
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setShowCreate(false)} disabled={createPortfolio.isPending}>Cancel</Button>
               <Button onClick={handleCreate} disabled={!newName.trim() || createPortfolio.isPending} className={createPortfolio.isPending ? "disabled:opacity-100" : ""}>
