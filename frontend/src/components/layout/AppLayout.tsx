@@ -106,7 +106,9 @@ export function AppLayout() {
               />
             </div>
             {createPortfolio.isError && (
-              <p className="text-sm text-destructive">Failed to create portfolio. Please try again.</p>
+              <p className="text-sm text-destructive">
+                {(createPortfolio.error as any)?.response?.data?.detail || "Failed to create portfolio. Please try again."}
+              </p>
             )}
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setShowCreate(false)} disabled={createPortfolio.isPending}>Cancel</Button>

@@ -20,7 +20,10 @@ def list_portfolios():
 
 @router.post("", response_model=PortfolioResponse, status_code=201)
 def create_portfolio(data: PortfolioCreate):
-    return portfolio_service.create_portfolio(data)
+    try:
+        return portfolio_service.create_portfolio(data)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/{portfolio_id}", response_model=PortfolioResponse)

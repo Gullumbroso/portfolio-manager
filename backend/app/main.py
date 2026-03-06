@@ -31,4 +31,10 @@ app.include_router(market_data.router, prefix="/api/market", tags=["market"])
 
 @app.get("/api/health")
 def health_check():
-    return {"status": "ok"}
+    from app.database import get_supabase
+    try:
+        db = get_supabase()
+        db.table("portfolios").select("id").limit(1).execute()
+        return {"status": "ok", "database": "connected"}
+    except Exception as e:
+        return {"status": "degraded", "database": str(e)}
