@@ -57,28 +57,86 @@ export function TransactionHistoryPage() {
               <p className="text-sm mt-1">Start by making a deposit.</p>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Ticker</TableHead>
-                  <TableHead className="text-right">Shares</TableHead>
-                  <TableHead className="text-right">Price</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
-                  <TableHead>Note</TableHead>
-                  <TableHead></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+            <>
+              {/* Desktop table */}
+              <div className="hidden md:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Ticker</TableHead>
+                      <TableHead className="text-right">Shares</TableHead>
+                      <TableHead className="text-right">Price</TableHead>
+                      <TableHead className="text-right">Amount</TableHead>
+                      <TableHead>Note</TableHead>
+                      <TableHead></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {transactions.map((txn) => {
+                      const auto = isAutoTransaction(txn.note)
+                      return (
+                        <TableRow key={txn.id} className={cn(auto && "opacity-60")}>
+                          <TableCell className="text-sm">
+                            {new Date(txn.transacted_at).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1.5">
+                              <Badge variant="outline" className={cn("text-xs", TYPE_COLORS[txn.type])}>
+                                {txn.type}
+                              </Badge>
+                              {auto && (
+                                <Badge variant="outline" className="text-xs text-muted-foreground border-muted">
+                                  Auto
+                                </Badge>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="font-mono font-medium">
+                            {txn.ticker ?? "—"}
+                          </TableCell>
+                          <TableCell className="text-right font-mono">
+                            {txn.shares != null ? txn.shares : "—"}
+                          </TableCell>
+                          <TableCell className="text-right font-mono">
+                            {txn.price_per_share != null ? formatCurrency(txn.price_per_share) : "—"}
+                          </TableCell>
+                          <TableCell className="text-right font-mono font-medium">
+                            {formatCurrency(txn.amount)}
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground max-w-[200px] truncate">
+                            {auto ? cleanNote(txn.note) : (txn.note || "—")}
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                              onClick={() => {
+                                if (confirm("Delete this transaction? This will affect your portfolio balance.")) {
+                                  deleteTxn.mutate(txn.id)
+                                }
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Mobile card list */}
+              <div className="md:hidden space-y-3">
                 {transactions.map((txn) => {
                   const auto = isAutoTransaction(txn.note)
+                  const displayNote = auto ? cleanNote(txn.note) : txn.note
                   return (
-                    <TableRow key={txn.id} className={cn(auto && "opacity-60")}>
-                      <TableCell className="text-sm">
-                        {new Date(txn.transacted_at).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell>
+                    <div key={txn.id} className={cn("rounded-lg border p-3 space-y-2", auto && "opacity-60")}>
+                      <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1.5">
                           <Badge variant="outline" className={cn("text-xs", TYPE_COLORS[txn.type])}>
                             {txn.type}
@@ -88,42 +146,46 @@ export function TransactionHistoryPage() {
                               Auto
                             </Badge>
                           )}
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(txn.transacted_at).toLocaleDateString()}
+                          </span>
                         </div>
-                      </TableCell>
-                      <TableCell className="font-mono font-medium">
-                        {txn.ticker ?? "—"}
-                      </TableCell>
-                      <TableCell className="text-right font-mono">
-                        {txn.shares != null ? txn.shares : "—"}
-                      </TableCell>
-                      <TableCell className="text-right font-mono">
-                        {txn.price_per_share != null ? formatCurrency(txn.price_per_share) : "—"}
-                      </TableCell>
-                      <TableCell className="text-right font-mono font-medium">
-                        {formatCurrency(txn.amount)}
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground max-w-[200px] truncate">
-                        {auto ? cleanNote(txn.note) : (txn.note || "—")}
-                      </TableCell>
-                      <TableCell>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                          className="h-7 w-7 text-muted-foreground hover:text-destructive"
                           onClick={() => {
                             if (confirm("Delete this transaction? This will affect your portfolio balance.")) {
                               deleteTxn.mutate(txn.id)
                             }
                           }}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-3.5 w-3.5" />
                         </Button>
-                      </TableCell>
-                    </TableRow>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono font-medium text-sm">
+                          {txn.ticker ?? "—"}
+                        </span>
+                        <span className="font-mono font-medium">
+                          {formatCurrency(txn.amount)}
+                        </span>
+                      </div>
+                      {txn.shares != null && (
+                        <div className="text-xs text-muted-foreground">
+                          {txn.shares} shares @ {formatCurrency(txn.price_per_share!)}
+                        </div>
+                      )}
+                      {displayNote ? (
+                        <div className="text-xs text-muted-foreground truncate">
+                          {displayNote}
+                        </div>
+                      ) : null}
+                    </div>
                   )
                 })}
-              </TableBody>
-            </Table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

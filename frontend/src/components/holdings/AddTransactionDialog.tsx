@@ -94,7 +94,7 @@ export function AddTransactionDialog({ open, onOpenChange, portfolioId, cashBala
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           {/* Type selector */}
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {TYPES.map((t) => (
               <Button
                 key={t.value}
@@ -127,7 +127,7 @@ export function AddTransactionDialog({ open, onOpenChange, portfolioId, cashBala
                   required
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="shares">Shares</Label>
                   <Input
@@ -166,26 +166,28 @@ export function AddTransactionDialog({ open, onOpenChange, portfolioId, cashBala
 
                   {cashBalance > 0 ? (
                     <>
-                      <div className="flex items-center gap-3">
-                        <Label htmlFor="fromCash" className="text-sm w-28 shrink-0 text-muted-foreground">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+                        <Label htmlFor="fromCash" className="text-sm text-muted-foreground sm:w-28 sm:shrink-0">
                           From cash
                         </Label>
-                        <div className="relative flex-1">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
-                          <Input
-                            id="fromCash"
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            max={maxFromCash}
-                            value={fromCash}
-                            onChange={(e) => setFromCash(e.target.value)}
-                            className="pl-7"
-                          />
+                        <div className="flex items-center gap-3 flex-1">
+                          <div className="relative flex-1">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
+                            <Input
+                              id="fromCash"
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              max={maxFromCash}
+                              value={fromCash}
+                              onChange={(e) => setFromCash(e.target.value)}
+                              className="pl-7"
+                            />
+                          </div>
+                          <span className="text-xs text-muted-foreground shrink-0">
+                            of {formatCurrency(cashBalance)}
+                          </span>
                         </div>
-                        <span className="text-xs text-muted-foreground w-20 text-right shrink-0">
-                          of {formatCurrency(cashBalance)}
-                        </span>
                       </div>
 
                       <div className="flex items-center justify-between text-sm">

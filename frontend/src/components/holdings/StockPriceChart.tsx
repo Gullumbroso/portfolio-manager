@@ -35,7 +35,7 @@ export function StockPriceChart({ ticker, data, period, onPeriodChange, isLoadin
         horzLines: { color: "rgba(0,0,0,0.06)" },
       },
       width: chartRef.current.clientWidth,
-      height: 400,
+      height: chartRef.current.clientWidth < 640 ? 280 : 400,
       timeScale: { borderColor: "rgba(0,0,0,0.1)" },
       rightPriceScale: { borderColor: "rgba(0,0,0,0.1)" },
     })
@@ -76,9 +76,9 @@ export function StockPriceChart({ ticker, data, period, onPeriodChange, isLoadin
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <CardTitle>{ticker}</CardTitle>
-        <div className="flex gap-1">
+        <div className="flex flex-wrap gap-1">
           {PERIODS.map((p) => (
             <Button
               key={p}
@@ -93,11 +93,11 @@ export function StockPriceChart({ ticker, data, period, onPeriodChange, isLoadin
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <div className="h-[400px] flex items-center justify-center text-muted-foreground">
+          <div className="h-[280px] sm:h-[400px] flex items-center justify-center text-muted-foreground">
             Loading chart...
           </div>
         ) : !data?.length ? (
-          <div className="h-[400px] flex items-center justify-center text-muted-foreground">
+          <div className="h-[280px] sm:h-[400px] flex items-center justify-center text-muted-foreground">
             No data available
           </div>
         ) : (

@@ -36,52 +36,90 @@ export function HoldingsTable({ holdings, portfolioId, isLoading, onAddTransacti
             <p className="text-sm mt-1">Add a deposit and buy some stocks to get started.</p>
           </div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Ticker</TableHead>
-                <TableHead className="text-right">Shares</TableHead>
-                <TableHead className="text-right">Price</TableHead>
-                <TableHead className="text-right">Day Change</TableHead>
-                <TableHead className="text-right">Value</TableHead>
-                <TableHead className="text-right">P/L</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+          <>
+            {/* Desktop table */}
+            <div className="hidden md:block">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Ticker</TableHead>
+                    <TableHead className="text-right">Shares</TableHead>
+                    <TableHead className="text-right">Price</TableHead>
+                    <TableHead className="text-right">Day Change</TableHead>
+                    <TableHead className="text-right">Value</TableHead>
+                    <TableHead className="text-right">P/L</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {holdings.map((h) => (
+                    <TableRow key={h.ticker}>
+                      <TableCell>
+                        <TickerBadge ticker={h.ticker} portfolioId={portfolioId} />
+                      </TableCell>
+                      <TableCell className="text-right font-mono">
+                        {formatNumber(h.total_shares, h.total_shares % 1 === 0 ? 0 : 2)}
+                      </TableCell>
+                      <TableCell className="text-right font-mono">
+                        {h.current_price != null ? formatCurrency(h.current_price) : "—"}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {h.day_change_percent != null ? (
+                          <span className={h.day_change_percent >= 0 ? "text-profit" : "text-loss"}>
+                            {formatPercent(h.day_change_percent)}
+                          </span>
+                        ) : "—"}
+                      </TableCell>
+                      <TableCell className="text-right font-mono">
+                        {h.market_value != null ? formatCurrency(h.market_value) : "—"}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {h.total_gain_dollars != null ? (
+                          <ProfitDisplay
+                            dollars={h.total_gain_dollars}
+                            percent={h.total_gain_percent ?? undefined}
+                            size="sm"
+                          />
+                        ) : "—"}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Mobile card list */}
+            <div className="md:hidden space-y-3">
               {holdings.map((h) => (
-                <TableRow key={h.ticker}>
-                  <TableCell>
+                <div key={h.ticker} className="rounded-lg border p-3 space-y-2">
+                  <div className="flex items-center justify-between">
                     <TickerBadge ticker={h.ticker} portfolioId={portfolioId} />
-                  </TableCell>
-                  <TableCell className="text-right font-mono">
-                    {formatNumber(h.total_shares, h.total_shares % 1 === 0 ? 0 : 2)}
-                  </TableCell>
-                  <TableCell className="text-right font-mono">
-                    {h.current_price != null ? formatCurrency(h.current_price) : "—"}
-                  </TableCell>
-                  <TableCell className="text-right">
+                    <span className="font-mono font-medium">
+                      {h.market_value != null ? formatCurrency(h.market_value) : "—"}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    <span>
+                      {formatNumber(h.total_shares, h.total_shares % 1 === 0 ? 0 : 2)} shares @ {h.current_price != null ? formatCurrency(h.current_price) : "—"}
+                    </span>
                     {h.day_change_percent != null ? (
                       <span className={h.day_change_percent >= 0 ? "text-profit" : "text-loss"}>
                         {formatPercent(h.day_change_percent)}
                       </span>
-                    ) : "—"}
-                  </TableCell>
-                  <TableCell className="text-right font-mono">
-                    {h.market_value != null ? formatCurrency(h.market_value) : "—"}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {h.total_gain_dollars != null ? (
+                    ) : null}
+                  </div>
+                  {h.total_gain_dollars != null && (
+                    <div className="flex justify-end">
                       <ProfitDisplay
                         dollars={h.total_gain_dollars}
                         percent={h.total_gain_percent ?? undefined}
                         size="sm"
                       />
-                    ) : "—"}
-                  </TableCell>
-                </TableRow>
+                    </div>
+                  )}
+                </div>
               ))}
-            </TableBody>
-          </Table>
+            </div>
+          </>
         )}
       </CardContent>
     </Card>
