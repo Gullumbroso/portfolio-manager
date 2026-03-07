@@ -35,6 +35,8 @@ export function PerformanceChart({ data, period, onPeriodChange, isLoading }: Pr
       },
       width: chartRef.current.clientWidth,
       height: chartRef.current.clientWidth < 640 ? 220 : 300,
+      handleScroll: false,
+      handleScale: false,
       timeScale: { borderColor: "rgba(0,0,0,0.1)" },
       rightPriceScale: { borderColor: "rgba(0,0,0,0.1)" },
     })
@@ -54,17 +56,6 @@ export function PerformanceChart({ data, period, onPeriodChange, isLoading }: Pr
     )
 
     chart.timeScale().fitContent()
-
-    // Clamp visible range to data boundaries
-    const dataLength = data.length
-    chart.timeScale().subscribeVisibleLogicalRangeChange((range) => {
-      if (!range) return
-      const from = Math.max(range.from, 0)
-      const to = Math.min(range.to, dataLength - 1)
-      if (from !== range.from || to !== range.to) {
-        chart.timeScale().setVisibleLogicalRange({ from, to })
-      }
-    })
 
     chartInstance.current = chart
 

@@ -36,6 +36,8 @@ export function StockPriceChart({ ticker, data, period, onPeriodChange, isLoadin
       },
       width: chartRef.current.clientWidth,
       height: chartRef.current.clientWidth < 640 ? 280 : 400,
+      handleScroll: false,
+      handleScale: false,
       timeScale: { borderColor: "rgba(0,0,0,0.1)" },
       rightPriceScale: { borderColor: "rgba(0,0,0,0.1)" },
     })

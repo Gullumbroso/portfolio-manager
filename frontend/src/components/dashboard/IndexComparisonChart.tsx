@@ -88,6 +88,8 @@ export function IndexComparisonChart({ portfolioId }: Props) {
       },
       width: chartRef.current.clientWidth,
       height: chartRef.current.clientWidth < 640 ? 250 : 350,
+      handleScroll: false,
+      handleScale: false,
       timeScale: { borderColor: "rgba(0,0,0,0.1)" },
       rightPriceScale: {
         borderColor: "rgba(0,0,0,0.1)",
@@ -121,21 +123,6 @@ export function IndexComparisonChart({ portfolioId }: Props) {
     }
 
     chart.timeScale().fitContent()
-
-    // Clamp visible range to the longest series boundaries
-    const allLengths = [
-      portfolioNormalized.length,
-      ...Object.values(indexDataMap).map((d) => d.length),
-    ]
-    const maxLength = Math.max(...allLengths)
-    chart.timeScale().subscribeVisibleLogicalRangeChange((range) => {
-      if (!range || maxLength === 0) return
-      const from = Math.max(range.from, 0)
-      const to = Math.min(range.to, maxLength - 1)
-      if (from !== range.from || to !== range.to) {
-        chart.timeScale().setVisibleLogicalRange({ from, to })
-      }
-    })
 
     chartInstance.current = chart
 
