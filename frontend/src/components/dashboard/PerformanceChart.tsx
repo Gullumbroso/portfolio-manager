@@ -100,7 +100,7 @@ export function PerformanceChart({ data, period, onPeriodChange, isLoading }: Pr
             No performance data yet. Data is captured daily.
           </div>
         ) : (
-          <div ref={chartRef} />
+          <div ref={chartRef} className="min-h-[220px] sm:min-h-[300px]" />
         )}
       </CardContent>
     </Card>
