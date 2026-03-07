@@ -73,3 +73,20 @@ export function StreamingMessage({ content }: StreamingMessageProps) {
     </div>
   )
 }
+
+export function ThinkingIndicator() {
+  return (
+    <div className="flex gap-3 justify-start">
+      <div className="flex-shrink-0 w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center mt-1">
+        <Bot className="h-4 w-4 text-primary" />
+      </div>
+      <div className="rounded-lg px-4 py-3 bg-muted">
+        <div className="flex items-center gap-1">
+          <span className="w-2 h-2 rounded-full bg-foreground/40 animate-[bounce_1.4s_ease-in-out_infinite]" />
+          <span className="w-2 h-2 rounded-full bg-foreground/40 animate-[bounce_1.4s_ease-in-out_0.2s_infinite]" />
+          <span className="w-2 h-2 rounded-full bg-foreground/40 animate-[bounce_1.4s_ease-in-out_0.4s_infinite]" />
+        </div>
+      </div>
+    </div>
+  )
+}
