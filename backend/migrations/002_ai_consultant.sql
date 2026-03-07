@@ -17,7 +17,7 @@ CREATE INDEX idx_chat_sessions_updated ON chat_sessions(updated_at DESC);
 CREATE TRIGGER set_chat_sessions_updated_at
     BEFORE UPDATE ON chat_sessions
     FOR EACH ROW
-    EXECUTE FUNCTION update_updated_at();
+    EXECUTE FUNCTION update_updated_at_column();
 
 -- Chat messages
 CREATE TABLE chat_messages (
