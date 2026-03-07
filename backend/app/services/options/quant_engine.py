@@ -1,10 +1,19 @@
 """Black-Scholes pricing, Greeks computation, and strategy risk analysis."""
 from __future__ import annotations
 import math
-from scipy.stats import norm
-
 
 RISK_FREE_RATE = 0.05  # 5% annual
+
+# Pure-Python normal distribution (replaces scipy.stats.norm)
+_SQRT_2PI = math.sqrt(2 * math.pi)
+
+
+def _norm_pdf(x: float) -> float:
+    return math.exp(-0.5 * x * x) / _SQRT_2PI
+
+
+def _norm_cdf(x: float) -> float:
+    return 0.5 * (1.0 + math.erf(x / math.sqrt(2)))
 
 
 def black_scholes_price(
@@ -25,8 +34,8 @@ def black_scholes_price(
     d2 = d1 - sigma * math.sqrt(T)
 
     if option_type == "call":
-        return S * norm.cdf(d1) - K * math.exp(-r * T) * norm.cdf(d2)
-    return K * math.exp(-r * T) * norm.cdf(-d2) - S * norm.cdf(-d1)
+        return S * _norm_cdf(d1) - K * math.exp(-r * T) * _norm_cdf(d2)
+    return K * math.exp(-r * T) * _norm_cdf(-d2) - S * _norm_cdf(-d1)
 
 
 def compute_greeks(
@@ -42,20 +51,20 @@ def compute_greeks(
     d1 = (math.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * sqrt_T)
     d2 = d1 - sigma * sqrt_T
 
-    gamma = norm.pdf(d1) / (S * sigma * sqrt_T)
-    vega = S * norm.pdf(d1) * sqrt_T / 100  # per 1% vol move
+    gamma = _norm_pdf(d1) / (S * sigma * sqrt_T)
+    vega = S * _norm_pdf(d1) * sqrt_T / 100  # per 1% vol move
 
     if option_type == "call":
-        delta = norm.cdf(d1)
+        delta = _norm_cdf(d1)
         theta = (
-            -S * norm.pdf(d1) * sigma / (2 * sqrt_T)
-            - r * K * math.exp(-r * T) * norm.cdf(d2)
+            -S * _norm_pdf(d1) * sigma / (2 * sqrt_T)
+            - r * K * math.exp(-r * T) * _norm_cdf(d2)
         ) / 365
     else:
-        delta = norm.cdf(d1) - 1
+        delta = _norm_cdf(d1) - 1
         theta = (
-            -S * norm.pdf(d1) * sigma / (2 * sqrt_T)
-            + r * K * math.exp(-r * T) * norm.cdf(-d2)
+            -S * _norm_pdf(d1) * sigma / (2 * sqrt_T)
+            + r * K * math.exp(-r * T) * _norm_cdf(-d2)
         ) / 365
 
     return {
