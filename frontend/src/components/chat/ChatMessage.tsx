@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils"
 import type { ChatMessage as ChatMessageType } from "@/types"
 import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 import { RecommendationCard } from "@/components/options/RecommendationCard"
 import { User, Bot } from "lucide-react"
 
@@ -31,8 +32,8 @@ export function ChatMessage({ message, portfolioId }: ChatMessageProps) {
           {isUser ? (
             <p className="whitespace-pre-wrap">{message.content}</p>
           ) : (
-            <div className="prose prose-sm dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
-              <ReactMarkdown>{message.content}</ReactMarkdown>
+            <div className="prose prose-sm dark:prose-invert max-w-none overflow-x-auto [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
             </div>
           )}
         </div>
@@ -63,8 +64,8 @@ export function StreamingMessage({ content }: StreamingMessageProps) {
       </div>
       <div className="max-w-[85%] md:max-w-[75%]">
         <div className="rounded-lg px-4 py-2.5 text-sm bg-muted">
-          <div className="prose prose-sm dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
-            <ReactMarkdown>{content}</ReactMarkdown>
+          <div className="prose prose-sm dark:prose-invert max-w-none overflow-x-auto [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
           </div>
           <span className="inline-block w-1.5 h-4 bg-primary/60 animate-pulse ml-0.5 align-middle" />
         </div>

@@ -42,7 +42,7 @@ export function ChatPage() {
   const title = sessionData?.title || "New conversation"
 
   return (
-    <div className="flex flex-col h-[calc(100vh-3.5rem)] md:h-screen">
+    <div className="flex flex-col h-full -m-4 md:-m-6">
       {/* Header */}
       <div className="flex items-center gap-3 border-b px-4 py-3 flex-shrink-0">
         <Button
@@ -113,7 +113,9 @@ export function ChatPage() {
       </div>
 
       {/* Input */}
-      <ChatInput onSend={sendMessage} disabled={isStreaming} />
+      <div className="flex-shrink-0">
+        <ChatInput onSend={sendMessage} disabled={isStreaming} />
+      </div>
     </div>
   )
 }
