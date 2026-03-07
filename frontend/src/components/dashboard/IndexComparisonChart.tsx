@@ -26,7 +26,7 @@ export function IndexComparisonChart({ portfolioId }: Props) {
   const chartRef = useRef<HTMLDivElement>(null)
   const chartInstance = useRef<IChartApi | null>(null)
   const [period, setPeriod] = useState("1M")
-  const [enabledIndices, setEnabledIndices] = useState<Set<string>>(new Set(["^GSPC"]))
+  const [enabledIndices, setEnabledIndices] = useState<Set<string>>(new Set(INDEX_TICKERS.map((i) => i.ticker)))
 
   const { data: performance, isLoading: perfLoading } = usePortfolioPerformance(portfolioId, period)
 
