@@ -5,6 +5,8 @@ import { DashboardPage } from "@/pages/DashboardPage"
 import { PortfolioListPage } from "@/pages/PortfolioListPage"
 import { TransactionHistoryPage } from "@/pages/TransactionHistoryPage"
 import { StockDetailPage } from "@/pages/StockDetailPage"
+import { ChatListPage } from "@/pages/ChatListPage"
+import { ChatPage } from "@/pages/ChatPage"
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,6 +27,8 @@ function App() {
             <Route path="/portfolio/:portfolioId" element={<DashboardPage />} />
             <Route path="/portfolio/:portfolioId/transactions" element={<TransactionHistoryPage />} />
             <Route path="/portfolio/:portfolioId/stock/:ticker" element={<StockDetailPage />} />
+            <Route path="/portfolio/:portfolioId/chat" element={<ChatListPage />} />
+            <Route path="/portfolio/:portfolioId/chat/:sessionId" element={<ChatPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

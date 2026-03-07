@@ -9,6 +9,9 @@ import type {
   Quote,
   HistoryPoint,
   NewsArticle,
+  ChatSession,
+  ChatSessionDetail,
+  OptionsDecision,
 } from "@/types"
 
 const API_BASE = import.meta.env.VITE_API_URL || "/api"
@@ -88,5 +91,43 @@ export async function fetchHistory(ticker: string, period = "1M"): Promise<Histo
 
 export async function fetchNews(ticker: string): Promise<NewsArticle[]> {
   const { data } = await api.get(`/market/news/${ticker}`)
+  return data
+}
+
+// Chat / AI Consultant
+export async function createChatSession(portfolioId: string): Promise<ChatSession> {
+  const { data } = await api.post(`/portfolios/${portfolioId}/chat/sessions`)
+  return data
+}
+
+export async function fetchChatSessions(portfolioId: string): Promise<ChatSession[]> {
+  const { data } = await api.get(`/portfolios/${portfolioId}/chat/sessions`)
+  return data
+}
+
+export async function fetchChatSession(portfolioId: string, sessionId: string): Promise<ChatSessionDetail> {
+  const { data } = await api.get(`/portfolios/${portfolioId}/chat/sessions/${sessionId}`)
+  return data
+}
+
+export async function deleteChatSession(portfolioId: string, sessionId: string): Promise<void> {
+  await api.delete(`/portfolios/${portfolioId}/chat/sessions/${sessionId}`)
+}
+
+export function getChatMessageUrl(portfolioId: string, sessionId: string): string {
+  const baseUrl = api.defaults.baseURL || "/api"
+  return `${baseUrl}/portfolios/${portfolioId}/chat/sessions/${sessionId}/messages`
+}
+
+export async function recordDecision(
+  portfolioId: string,
+  recommendationId: string,
+  decision: string,
+  notes: string = ""
+): Promise<OptionsDecision> {
+  const { data } = await api.post(
+    `/portfolios/${portfolioId}/chat/recommendations/${recommendationId}/decision`,
+    { decision, notes }
+  )
   return data
 }

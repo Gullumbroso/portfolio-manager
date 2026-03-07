@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     supabase_url: str
     supabase_key: str
     finnhub_api_key: str = ""
+    anthropic_api_key: str = ""
+    anthropic_model: str = "claude-sonnet-4-6"
     cors_origins: str = "http://localhost:5173,https://portfolio-manager-dusky.vercel.app"
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
