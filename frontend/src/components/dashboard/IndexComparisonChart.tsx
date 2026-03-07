@@ -195,7 +195,7 @@ export function IndexComparisonChart({ portfolioId }: Props) {
             No data available. Enable an index or wait for portfolio data.
           </div>
         ) : (
-          <div ref={chartRef} />
+          <div ref={chartRef} className="min-h-[250px] sm:min-h-[350px]" />
         )}
       </CardContent>
     </Card>
