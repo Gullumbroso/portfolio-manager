@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { ArrowLeft, Bot } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { ChatMessage, StreamingMessage } from "@/components/chat/ChatMessage"
+import { ChatMessage, StreamingMessage, ThinkingIndicator } from "@/components/chat/ChatMessage"
 import { ChatInput } from "@/components/chat/ChatInput"
 import { ToolStatusIndicator } from "@/components/chat/ToolStatusIndicator"
 import { RecommendationCard } from "@/components/options/RecommendationCard"
@@ -106,7 +106,11 @@ export function ChatPage() {
               {pendingRecommendations.map((rec, i) => (
                 <RecommendationCard key={i} recommendation={rec} portfolioId={portfolioId!} />
               ))}
-              <StreamingMessage content={streamingContent} />
+              {streamingContent ? (
+                <StreamingMessage content={streamingContent} />
+              ) : toolStatuses.length === 0 ? (
+                <ThinkingIndicator />
+              ) : null}
             </>
           )}
         </div>
