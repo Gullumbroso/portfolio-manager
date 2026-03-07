@@ -1,6 +1,6 @@
 import { Select } from "@/components/ui/select"
 import type { Portfolio } from "@/types"
-import { TrendingUp, Pencil, Trash2, Menu } from "lucide-react"
+import { Pencil, Trash2, Menu } from "lucide-react"
 
 const CREATE_NEW_VALUE = "__create_new__"
 
@@ -40,8 +40,8 @@ export function Header({ portfolios, selectedId, onSelect, onCreatePortfolio, on
           <Menu className="h-5 w-5" />
         </button>
         <div className="flex items-center gap-2 font-semibold">
-          <TrendingUp className="h-5 w-5" />
-          <span className="hidden sm:inline">Portfolio Manager</span>
+          <img src="/logo.svg" alt="Tech Invest" className="h-5 w-5" />
+          <span className="hidden sm:inline">Tech Invest</span>
         </div>
         <div className="ml-auto flex items-center gap-2">
           <div className="min-w-0 flex-1 max-w-48 sm:max-w-64 sm:flex-none sm:w-64">
