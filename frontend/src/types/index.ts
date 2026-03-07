@@ -91,3 +91,95 @@ export interface NewsArticle {
   image: string | null
   datetime: number
 }
+
+// --- Chat / AI Consultant ---
+
+export interface ChatSession {
+  id: string
+  portfolio_id: string
+  title: string | null
+  status: string
+  created_at: string
+  updated_at: string
+  last_message_preview: string | null
+}
+
+export interface ChatMessage {
+  id: string
+  session_id: string
+  role: "user" | "assistant"
+  content: string
+  has_recommendation: boolean
+  created_at: string
+  recommendations: OptionsRecommendation[]
+}
+
+export interface ChatSessionDetail {
+  id: string
+  portfolio_id: string
+  title: string | null
+  status: string
+  created_at: string
+  updated_at: string
+  messages: ChatMessage[]
+}
+
+export interface RecommendationLeg {
+  id: string
+  leg_order: number
+  action: "buy" | "sell"
+  option_type: "call" | "put"
+  strike: number
+  contracts: number
+  premium: number | null
+  bid: number | null
+  ask: number | null
+  implied_volatility: number | null
+  open_interest: number | null
+  volume: number | null
+  delta: number | null
+  gamma: number | null
+  theta: number | null
+  vega: number | null
+}
+
+export interface OptionsRecommendation {
+  id: string
+  message_id: string
+  session_id: string
+  ticker: string
+  strategy_type: string
+  strategy_name: string
+  confidence_score: number | null
+  strategy_reasoning: string | null
+  strike_reasoning: string | null
+  expiration_reasoning: string | null
+  entry_conditions: string | null
+  exit_conditions: string | null
+  adverse_scenario: string | null
+  max_profit: number | null
+  max_loss: number | null
+  breakeven_prices: number[]
+  capital_required: number | null
+  margin_requirement: number | null
+  risk_reward_ratio: number | null
+  risk_score: number | null
+  has_unlimited_risk: boolean
+  has_assignment_risk: boolean
+  has_high_gamma: boolean
+  has_volatility_sensitivity: boolean
+  spot_price_at_analysis: number | null
+  expiration_date: string | null
+  days_to_expiry: number | null
+  legs: RecommendationLeg[]
+  decision: OptionsDecision | null
+  created_at: string
+}
+
+export interface OptionsDecision {
+  id: string
+  recommendation_id: string
+  decision: "accepted" | "rejected"
+  notes: string
+  created_at: string
+}

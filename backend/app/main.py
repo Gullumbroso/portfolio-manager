@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import get_settings
-from app.routers import portfolios, transactions, holdings, market_data
+from app.routers import portfolios, transactions, holdings, market_data, chat
 
 
 @asynccontextmanager
@@ -27,6 +27,7 @@ app.include_router(portfolios.router, prefix="/api/portfolios", tags=["portfolio
 app.include_router(transactions.router, prefix="/api/portfolios", tags=["transactions"])
 app.include_router(holdings.router, prefix="/api/portfolios", tags=["holdings"])
 app.include_router(market_data.router, prefix="/api/market", tags=["market"])
+app.include_router(chat.router, prefix="/api/portfolios", tags=["chat"])
 
 
 @app.get("/api/health")

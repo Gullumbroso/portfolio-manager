@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, ArrowLeftRight, List, Plus, X } from "lucide-react"
+import { LayoutDashboard, ArrowLeftRight, List, Plus, X, MessageSquare } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface SidebarProps {
@@ -25,6 +25,7 @@ function SidebarNav({ portfolioId, onCreatePortfolio, onNavigate }: {
     ? [
         { to: `/portfolio/${portfolioId}`, icon: LayoutDashboard, label: "Dashboard", end: true },
         { to: `/portfolio/${portfolioId}/transactions`, icon: ArrowLeftRight, label: "Transactions" },
+        { to: `/portfolio/${portfolioId}/chat`, icon: MessageSquare, label: "AI Consultant" },
       ]
     : []
 
